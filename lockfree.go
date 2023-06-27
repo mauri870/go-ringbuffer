@@ -12,34 +12,31 @@ func NewLockFree(cap int) *LockFree {
 	return &LockFree{data: make([]int, cap)}
 }
 
-func (r *LockFree) Push(val int) error {
+func (r *LockFree) Push(val int) bool {
 	writeIdx := r.writeIdx.Load()
-	nextWriteIdx := writeIdx + 1
+	nextWriteIdx := (writeIdx + 1) % int64(len(r.data))
 
 	if nextWriteIdx == int64(len(r.data)) {
 		nextWriteIdx = 0
 	}
 
 	if nextWriteIdx == r.readIdx.Load() {
-		return ErrBufferFull
+		return false
 	}
 
-	r.data[int(writeIdx)] = val
+	r.data[writeIdx] = val
 	r.writeIdx.Store(nextWriteIdx)
-	return nil
+	return true
 }
 
-func (r *LockFree) Pop() (int, error) {
+func (r *LockFree) Pop() (int, bool) {
 	readIdx := r.readIdx.Load()
 	if readIdx == r.writeIdx.Load() {
-		return 0, ErrBufferEmpty
+		return 0, false
 	}
-	nextReadIdx := readIdx + 1
-	if nextReadIdx == int64(len(r.data)) {
-		nextReadIdx = 0
-	}
+	nextReadIdx := (readIdx + 1) % int64(len(r.data))
 
 	r.readIdx.Store(nextReadIdx)
 	val := r.data[readIdx]
-	return val, nil
+	return val, true
 }

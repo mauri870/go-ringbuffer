@@ -8,6 +8,6 @@ var (
 )
 
 type RingBufferer interface {
-	Pop() (int, error)
-	Push(int) error
+	Pop() (int, bool)
+	Push(int) bool
 }
