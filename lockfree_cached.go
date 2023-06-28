@@ -10,8 +10,8 @@ type LockFreeCached struct {
 	writeIdxCached int64
 }
 
-func NewLockFreeCached(cap int) LockFreeCached {
-	return LockFreeCached{data: make([]int, cap)}
+func NewLockFreeCached(cap int) *LockFreeCached {
+	return &LockFreeCached{data: make([]int, cap)}
 }
 
 func (r *LockFreeCached) Push(val int) bool {

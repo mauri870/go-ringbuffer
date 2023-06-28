@@ -7,40 +7,36 @@ var testPushIters = 100000000
 var benchResult int
 var benchOk bool
 
-func BenchmarkLockFreePush(b *testing.B) {
-	buf := NewLockFree(testQueueSize)
-	for n := 0; n < b.N; n++ {
-		benchOk = buf.Push(n)
+func benchmarkBufferPush(b *testing.B, buf RingBufferer) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		buf.Push(i)
 	}
 }
 
-func BenchmarkLockFreePop(b *testing.B) {
-	buf := NewLockFree(testQueueSize)
+func benchmarkBufferPop(b *testing.B, buf RingBufferer) {
 	for n := 0; n < testPushIters; n++ {
 		buf.Push(n)
 	}
 
 	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+	for i := 0; i < b.N; i++ {
 		benchResult, benchOk = buf.Pop()
 	}
 }
 
+func BenchmarkLockFreePush(b *testing.B) { benchmarkBufferPush(b, NewLockFree(testQueueSize)) }
+func BenchmarkLockFreePop(b *testing.B)  { benchmarkBufferPop(b, NewLockFree(testQueueSize)) }
 func BenchmarkLockFreeCachedPush(b *testing.B) {
-	buf := NewLockFreeCached(testQueueSize)
-	for n := 0; n < b.N; n++ {
-		benchOk = buf.Push(n)
-	}
+	benchmarkBufferPush(b, NewLockFreeCached(testQueueSize))
+}
+func BenchmarkLockFreeCachedPop(b *testing.B) {
+	benchmarkBufferPop(b, NewLockFreeCached(testQueueSize))
 }
 
-func BenchmarkLockFreeCachedPop(b *testing.B) {
-	buf := NewLockFreeCached(testQueueSize)
-	for n := 0; n < testPushIters; n++ {
-		buf.Push(n)
-	}
-
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
-		benchResult, benchOk = buf.Pop()
-	}
+func BenchmarkLockFreeContainerRingPush(b *testing.B) {
+	benchmarkBufferPush(b, NewContainerRing(testQueueSize))
+}
+func BenchmarkLockFreeContainerRingPop(b *testing.B) {
+	benchmarkBufferPop(b, NewContainerRing(testQueueSize))
 }

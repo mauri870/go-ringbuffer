@@ -1,12 +1,6 @@
 package ringbuffer
 
-import "errors"
-
-var (
-	ErrBufferFull  = errors.New("buffer is full")
-	ErrBufferEmpty = errors.New("buffer is empty")
-)
-
+// RingBufferer defines an interface for a RingBuffer
 type RingBufferer interface {
 	Pop() (int, bool)
 	Push(int) bool
