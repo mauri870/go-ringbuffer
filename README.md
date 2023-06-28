@@ -31,7 +31,7 @@ There are a couple of different implementations available:
 ```go
 LockFreeCached // Fastest implementation, Lock free with a cache approach to minimize atomic memory operations
 LockFree // Lock free implementation
-ContainerRing // Lock free backed by container/ring, Slow and memory hungry, used only for benchmarks
+ContainerRing // Lock free backed by container/ring, intended for use on benchmarks
 ```
 
 # Benchmarks
