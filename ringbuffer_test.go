@@ -1,10 +1,23 @@
 package ringbuffer
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func ExampleNew() {
+	buf := New[int](3)
+
+	buf.Push(1)
+	buf.Push(2)
+	buf.Push(3) // buffer is full!
+
+	val, ok := buf.Pop()
+	fmt.Println(val, ok)
+	// Output: 1 true
+}
 
 func TestPushPop(t *testing.T) {
 	testCases := []struct {
