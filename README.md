@@ -7,7 +7,8 @@ ringBuffer is a Go package that provides an implementation of a ring buffer, als
 - Thread-safe implementation: A lock-free ring buffer implementation using atomic operations.
 - Generics ready
 - Flexible capacity: Set the capacity of the ring buffer upon initialization.
-- Efficient push and pop operations: Constant time complexity O(1).
+- Simple interface: Push and Pop methods
+- Efficient operations: Constant time complexity O(1).
 - High performance: Designed to be efficient for concurrent operations with minimal synchronization overhead.
 - Faster than container/ring and more memory efficient
 - Zero memory allocations (besides the initial buffer)
