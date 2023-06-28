@@ -2,17 +2,17 @@ package ringbuffer
 
 import "sync/atomic"
 
-type LockFree struct {
-	data     []int
+type LockFree[T any] struct {
+	data     []T
 	readIdx  atomic.Int64
 	writeIdx atomic.Int64
 }
 
-func NewLockFree(cap int) *LockFree {
-	return &LockFree{data: make([]int, cap)}
+func NewLockFree[T any](cap int) *LockFree[T] {
+	return &LockFree[T]{data: make([]T, cap)}
 }
 
-func (r *LockFree) Push(val int) bool {
+func (r *LockFree[T]) Push(val T) bool {
 	writeIdx := r.writeIdx.Load()
 	nextWriteIdx := (writeIdx + 1) % int64(len(r.data))
 
@@ -29,10 +29,10 @@ func (r *LockFree) Push(val int) bool {
 	return true
 }
 
-func (r *LockFree) Pop() (int, bool) {
+func (r *LockFree[T]) Pop() (T, bool) {
 	readIdx := r.readIdx.Load()
 	if readIdx == r.writeIdx.Load() {
-		return 0, false
+		return *new(T), false
 	}
 	nextReadIdx := (readIdx + 1) % int64(len(r.data))
 

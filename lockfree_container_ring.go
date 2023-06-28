@@ -5,21 +5,21 @@ import (
 	"sync/atomic"
 )
 
-type LockFreeContainerRing struct {
+type LockFreeContainerRing[T any] struct {
 	buffer   *ring.Ring
 	capacity uint64
 	readIdx  atomic.Uint64
 	writeIdx atomic.Uint64
 }
 
-func NewContainerRing(cap int) *LockFreeContainerRing {
-	return &LockFreeContainerRing{
+func NewContainerRing[T any](cap int) *LockFreeContainerRing[T] {
+	return &LockFreeContainerRing[T]{
 		buffer:   ring.New(cap),
 		capacity: uint64(cap),
 	}
 }
 
-func (r *LockFreeContainerRing) Push(val int) bool {
+func (r *LockFreeContainerRing[T]) Push(val T) bool {
 	writeIdx := r.writeIdx.Load()
 	nextWriteIdx := (writeIdx + 1) % r.capacity
 
@@ -33,17 +33,17 @@ func (r *LockFreeContainerRing) Push(val int) bool {
 	return true
 }
 
-func (r *LockFreeContainerRing) Pop() (int, bool) {
+func (r *LockFreeContainerRing[T]) Pop() (T, bool) {
 	readIdx := r.readIdx.Load()
 	if readIdx == r.writeIdx.Load() {
-		return 0, false
+		return *new(T), false
 	}
 	nextReadIdx := (readIdx + 1) % r.capacity
 
 	r.buffer = r.buffer.Next()
-	val, ok := r.buffer.Value.(int)
+	val, ok := r.buffer.Value.(T)
 	if !ok {
-		return 0, ok
+		return *new(T), ok
 	}
 
 	r.readIdx.Store(nextReadIdx)

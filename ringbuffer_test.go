@@ -9,11 +9,11 @@ import (
 func TestPushPop(t *testing.T) {
 	testCases := []struct {
 		name string
-		buf  RingBufferer
+		buf  RingBufferer[int]
 	}{
-		{"lock free", NewLockFree(3)},
-		{"lock free cached", NewLockFreeCached(3)},
-		{"lock free container ring", NewContainerRing(3)},
+		{"lock free", NewLockFree[int](3)},
+		{"lock free cached", NewLockFreeCached[int](3)},
+		{"lock free container ring", NewContainerRing[int](3)},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
