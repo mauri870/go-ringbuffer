@@ -4,10 +4,10 @@ import "sync/atomic"
 
 type LockFreeCached[T any] struct {
 	data           []T
-	readIdx        atomic.Int64
-	readIdxCached  int64
-	writeIdx       atomic.Int64
-	writeIdxCached int64
+	readIdx        atomic.Uint64
+	readIdxCached  uint64
+	writeIdx       atomic.Uint64
+	writeIdxCached uint64
 }
 
 func NewLockFreeCached[T any](cap int) *LockFreeCached[T] {
@@ -16,7 +16,7 @@ func NewLockFreeCached[T any](cap int) *LockFreeCached[T] {
 
 func (r *LockFreeCached[T]) Push(val T) bool {
 	writeIdx := r.writeIdx.Load()
-	nextWriteIdx := (writeIdx + 1) % int64(len(r.data))
+	nextWriteIdx := (writeIdx + 1) % uint64(len(r.data))
 
 	if nextWriteIdx == r.readIdxCached {
 		r.readIdxCached = r.readIdx.Load()
@@ -39,7 +39,7 @@ func (r *LockFreeCached[T]) Pop() (T, bool) {
 		}
 	}
 
-	nextReadIdx := (readIdx + 1) % int64(len(r.data))
+	nextReadIdx := (readIdx + 1) % uint64(len(r.data))
 
 	r.readIdx.Store(nextReadIdx)
 	val := r.data[readIdx]

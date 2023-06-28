@@ -4,8 +4,8 @@ import "sync/atomic"
 
 type LockFree[T any] struct {
 	data     []T
-	readIdx  atomic.Int64
-	writeIdx atomic.Int64
+	readIdx  atomic.Uint64
+	writeIdx atomic.Uint64
 }
 
 func NewLockFree[T any](cap int) *LockFree[T] {
@@ -14,9 +14,9 @@ func NewLockFree[T any](cap int) *LockFree[T] {
 
 func (r *LockFree[T]) Push(val T) bool {
 	writeIdx := r.writeIdx.Load()
-	nextWriteIdx := (writeIdx + 1) % int64(len(r.data))
+	nextWriteIdx := (writeIdx + 1) % uint64(len(r.data))
 
-	if nextWriteIdx == int64(len(r.data)) {
+	if nextWriteIdx == uint64(len(r.data)) {
 		nextWriteIdx = 0
 	}
 
@@ -34,7 +34,7 @@ func (r *LockFree[T]) Pop() (T, bool) {
 	if readIdx == r.writeIdx.Load() {
 		return *new(T), false
 	}
-	nextReadIdx := (readIdx + 1) % int64(len(r.data))
+	nextReadIdx := (readIdx + 1) % uint64(len(r.data))
 
 	r.readIdx.Store(nextReadIdx)
 	val := r.data[readIdx]
